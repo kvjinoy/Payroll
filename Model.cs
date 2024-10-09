@@ -1,6 +1,6 @@
 ﻿namespace Payroll
 {
-    
+
     public class Deduction
     {
         public string code { get; set; }
