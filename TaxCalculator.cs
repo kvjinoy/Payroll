@@ -8,31 +8,43 @@ namespace Payroll
 {
     public interface ITaxCalculator
     {
-        double GetTax(List<Tax> taxes, double taxableAmount);
+        (double TaxAmount, List<Withholding> Withholdings) GetTax(List<Tax> taxes, double taxableAmount);
     }
 
     internal class TaxCalculator : ITaxCalculator
     {
+        const string TaxWithholdingType = "tax";
 
-        public double GetTax(List<Tax> taxes, double taxableAmount)
+        public (double TaxAmount, List<Withholding> Withholdings) GetTax(List<Tax> taxes, double taxableAmount)
         {
             double totalTaxes = 0;
+            List<Withholding> withholdings = new List<Withholding>();
 
             foreach (var tax in taxes)
             {
+
+                var withholding = new Withholding();
+                withholding.Code = tax.code.ToString();
+                withholding.Type = TaxWithholdingType;
+                double amountWithHeld = 0;
+
+
                 if (tax.type == TaxType.percentage)
-                    totalTaxes += tax.value * taxableAmount / 100;
+                    amountWithHeld = tax.value * taxableAmount / 100;
 
                 if (tax.type == TaxType.cappedPercentage)
                 {
                     var cappedTaxamount = tax.value * taxableAmount / 100;
                     if (cappedTaxamount > tax.cap)
                         cappedTaxamount = tax.cap.Value;
-                    totalTaxes += cappedTaxamount;
+                    amountWithHeld = cappedTaxamount;
                 }
+
+                totalTaxes += amountWithHeld;
+
             }
 
-            return totalTaxes;
+            return (totalTaxes, withholdings);
         }
 
 

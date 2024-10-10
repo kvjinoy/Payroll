@@ -8,25 +8,37 @@ namespace Payroll
 {
     public interface IDeductionsCalculator
     {
-        double GetDeductions(List<Deduction> deductions, double totalEarnings);
+        (double DeductionAmount, List<Withholding> Withholdings) GetDeductions(List<Deduction> deductions, double totalEarnings);
     }
 
     internal class DeductionsCalculator : IDeductionsCalculator
     {
-        public double GetDeductions(List<Deduction> deductions, double totalEarnings)
-        {
+        const string DeductionWithholdingType = "Deduction";
 
+        public (double DeductionAmount, List<Withholding> Withholdings) GetDeductions(List<Deduction> deductions, double totalEarnings)
+        {
+            List<Withholding> withholdings = new List<Withholding>();
             double totalDeductions = 0;
+
             foreach (var deduction in deductions)
             {
+                var withholding = new Withholding();
+                withholding.Code = deduction.code;
+                withholding.Type = DeductionWithholdingType;
+                double amountWithHeld = 0;
+
                 if (deduction.type == DeductionType.percentage)
-                    totalDeductions += deduction.value * totalEarnings / 100;
+                    amountWithHeld =  deduction.value * totalEarnings / 100;
 
                 if ((deduction.type == DeductionType.flat) && (deduction.value > 0))
-                    totalDeductions += deduction.value;
+                    amountWithHeld =  deduction.value;
 
+                totalDeductions += amountWithHeld;
+                withholding.AmountWithheld = amountWithHeld;
+                withholdings.Add(withholding);
             }
-            return totalDeductions;
+
+            return (totalDeductions, withholdings) ;
 
         }
     }

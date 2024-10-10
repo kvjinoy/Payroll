@@ -19,31 +19,41 @@ namespace Payroll
             _taxCalculator = taxCalculator;
         }
 
-        public double CalculateNetPay(List<Earning> earnings, List<Deduction> deductions, List<Tax> taxes)
+        private Output CalculateNetPay(List<Earning> earnings, List<Deduction> deductions, List<Tax> taxes)
         {
 
             var taxableEarnings = _earningsCalculator.GetEarnings(earnings.Where(e => e.isTaxable == true).ToList());
             var nonTaxableEarnings = _earningsCalculator.GetEarnings(earnings.Where(e => e.isTaxable = false).ToList());
             var preTaxDeductions = _deductionsCalculator.GetDeductions(deductions.Where(d=>d.isPreTax == true).ToList(), taxableEarnings);
 
-            var taxableAmount = taxableEarnings - preTaxDeductions;
+            var taxableAmount = taxableEarnings - preTaxDeductions.DeductionAmount;
 
-            var taxToPay = _taxCalculator.GetTax(taxes, taxableAmount);
+            var taxesToPay = _taxCalculator.GetTax(taxes, taxableAmount);
 
-            var amountForPostTaxDeduction = taxableAmount - preTaxDeductions - taxToPay;
+            var amountForPostTaxDeduction = taxableAmount - preTaxDeductions.DeductionAmount - taxesToPay.TaxAmount;
             var postTaxDeductions = _deductionsCalculator.GetDeductions(deductions.Where(d => d.isPreTax == false).ToList(), amountForPostTaxDeduction);
 
-            var netPay = taxableEarnings - preTaxDeductions - taxToPay - postTaxDeductions + nonTaxableEarnings;
+            var netPay = taxableEarnings - preTaxDeductions.DeductionAmount - taxesToPay.TaxAmount - postTaxDeductions.DeductionAmount  + nonTaxableEarnings;
 
-            return netPay;
+            var output = new Output();
+            output.GrossPay = taxableEarnings + nonTaxableEarnings;
+            output.GrossTaxableEarnings = taxableAmount;
+            output.NetPay = netPay;
+            var withholdings = new List<Withholding>();
+            withholdings.AddRange(preTaxDeductions.Withholdings);
+            withholdings.AddRange(postTaxDeductions.Withholdings);
+            withholdings.AddRange(taxesToPay.Withholdings);
+            output.Withholdings = withholdings;
+
+            return output;
         }
 
         public Output CalculatePayroll(Input input)
         {
-            var output = new Output();
+            var output = CalculateNetPay(input.earnings, input.deductions, input.taxes);
             return output;
 
-            //TODO Deduction and tax priority   and assign Withholding to Output 
+            //TODO Deduction and tax priority 
         }
     }
 }

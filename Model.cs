@@ -29,8 +29,8 @@
 
     public class Output
     {
-        public int GrossPay { get; set; }
-        public int GrossTaxableEarnings { get; set; }
+        public double GrossPay { get; set; }
+        public double GrossTaxableEarnings { get; set; }
         public List<Withholding> Withholdings { get; set; }
         public double NetPay { get; set; }
     }
