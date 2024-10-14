@@ -1,29 +1,44 @@
 **Payroll Calculator Demo**
 
-**Requirements:**
-Calculate the net pay as follows: net pay = taxable earnings - pre-tax deductions -taxes - post-tax deductions + non-taxable earnings
-Earning types
-Salary earnings are defined by a flat
-amount
-Hourly earnings are defined by an amount of
-hours
-and a
-rate
-Earnings that are not taxable are not withheld by deductions or taxes
-Pre-tax deductions are based on gross taxable-pay
-Flat vs percentage deductions (percentages encoded as
-value / 100
-)
-Taxes are based on gross taxable-pay less pre-tax deductions
-Taxes with a cap should not be withheld above the cap
-Post-tax deductions are based on gross taxable-pay less pre-tax deductions and taxes
-Deduction and tax priority
-When taxable earnings are less than deductions and taxes, withholding priority isas follows: pre-tax deductions before taxes before post-tax deductions.
-For each deduction and tax, a higher
-priority
-value indicates this item shouldbe withheld first.
-If a deduction or tax is cannot be withheld to the full amount, the deficit isrecorded.
-Output the following
-Gross pay
-Net pay to employee
-Amounts withheld for deductions and taxes by code with deficits
+The primary goal is to calculate the net pay for an employee, considering various earnings, deductions, and taxes. The challenge lies in the priority of deductions and taxes, especially when taxable earnings are insufficient to cover all withholdings.
+
+
+**1. Data Structure:**
+
+Employee:
+ID
+Name
+Earnings (Salary, Hourly)
+Deductions (Pre-tax, Post-tax)
+Taxes
+**Deduction/Tax:**
+Code
+Type (Flat, Percentage)
+Amount/Rate
+Priority
+Cap (if applicable)
+**2. Calculation Steps:**
+
+**Calculate Gross Pay:**
+Sum of salary and hourly earnings.
+Determine Taxable Earnings:
+Gross Pay minus non-taxable earnings.
+Calculate Pre-Tax Deductions:
+Apply deductions based on taxable earnings, considering priority and caps.
+Calculate Taxes:
+Apply taxes based on taxable earnings minus pre-tax deductions, considering priority and caps.
+Calculate Post-Tax Deductions:
+Apply deductions based on taxable earnings minus pre-tax deductions and taxes.
+Calculate Net Pay:
+Gross Pay minus pre-tax deductions, taxes, and post-tax deductions, plus non-taxable earnings.
+**3. Handling Insufficient Funds:**
+
+**Prioritize Deductions/Taxes:**
+If taxable earnings are insufficient to cover all withholdings, apply them in order of priority.
+Record Deficits:
+For any deduction or tax that cannot be withheld in full, record the deficit.
+**4. Output:**
+
+**Gross Pay:** Total earnings before deductions and taxes.
+**Net Pay:** Amount paid to the employee after deductions and taxes.
+**Withheld Amounts:** Deductions and taxes by code, including any deficits.
